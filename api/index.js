@@ -4,9 +4,16 @@ import dotenv from 'dotenv';
 import http from 'http';
 import userRoutes from './routes/user.route.js';
 import authRoutes from './routes/auth.route.js';
+import cors from 'cors';
 
-dotenv.config({ path: `.env.${process.env.NODE_ENV}`});
- mongoose.connect(process.env.MONGO_URL)
+dotenv.config();
+
+const app= express();
+
+const port = 3000;
+
+ mongoose.connect(process.env.MONGO)
+
 .then(() =>{
     console.log('Mongoose is connected');
 }
@@ -14,26 +21,24 @@ dotenv.config({ path: `.env.${process.env.NODE_ENV}`});
     console.log(error);
 })
 
-const app = express();
-const server = http.createServer(app);
+app.use(cors(""));
+
 app.use(express.json());
+app.listen (port, () => {
+    console.log(`server listening on port ${port}`)
+});
+
 
 app.use('/api/user', userRoutes)
 app.use('/api/auth', authRoutes)
 
-server.listen (3000, () => {
-    console.log(process.env.NODE_ENV)
-    console.log('server listening on port 3000')
-});
-
-
-// app.use((err,req,res,next) =>{
-//     const statusCode = err.statusCode || 500;
-//     const message = err.message || 'internal server error';
-//     res.status(statusCode).json({
-//         success: false,
-//         statusCode,
-//         message
-//     })
-// })
+app.use((err,req,res,next) =>{
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'internallll server error';
+    res.status(statusCode).json({
+        success: false,
+        statusCode,
+        message
+    })
+})
 
